@@ -30,7 +30,8 @@ class InitPluginsInstaller extends InitSection
         if ($repositoryClass) {
             $repository = new \ReflectionClass($this->$repositoryClass());
             $params = $repository->getDefaultProperties();
-            $section = $item[IPluginInstall::FIELD__SECTION] ?: $params['name'];
+            $itemSection = $item[IPluginInstall::FIELD__SECTION] ?? '';
+            $section = $itemSection ?: $params['name'];
 
             $pluginInstall = $this->createPluginInstall($section, $params, $item);
             $pluginUninstall = $this->createPluginUninstall($section, $params, $item);
