@@ -28,7 +28,7 @@ class InitPluginsInstaller extends InitSection
 
         $repositoryClass = $item[IPluginInstall::FIELD__REPOSITORY] ?? '';
         if ($repositoryClass) {
-            $repository = new \ReflectionClass($repositoryClass);
+            $repository = new \ReflectionClass($this->$repositoryClass());
             $params = $repository->getDefaultProperties();
             $section = $item[IPluginInstall::FIELD__SECTION] ?: $params['name'];
 
