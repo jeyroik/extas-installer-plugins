@@ -2,6 +2,9 @@
 namespace tests\plugins;
 
 use extas\components\packages\entities\EntityRepository;
+use extas\components\plugins\install\InstallItem;
+use extas\components\plugins\install\InstallPackage;
+use extas\components\plugins\TSnuffPlugins;
 use extas\interfaces\plugins\IPluginInstall;
 
 use extas\components\console\TSnuffConsole;
@@ -24,6 +27,7 @@ class InitPluginsTest extends TestCase
 {
     use TSnuffConsole;
     use TSnuffRepository;
+    use TSnuffPlugins;
 
     protected function setUp(): void
     {
@@ -74,8 +78,11 @@ class InitPluginsTest extends TestCase
             Installer::FIELD__OUTPUT => $output
         ]);
 
+        $this->createSnuffPlugin(InstallPackage::class, ['extas.install.package']);
+        $this->createSnuffPlugin(InstallItem::class, ['extas.install.item']);
+
         $installer->installPackages([
-            [
+            'test/installer' => [
                 'snuff_items' => [
                     ['id' => 'test1'],
                     ['id' => 'test2'],
