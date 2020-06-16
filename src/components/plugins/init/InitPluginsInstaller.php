@@ -1,6 +1,7 @@
 <?php
 namespace extas\components\plugins\init;
 
+use extas\components\plugins\Plugin;
 use extas\components\plugins\PluginRepository;
 use extas\interfaces\IHasClass;
 use extas\interfaces\IHasName;
@@ -32,16 +33,12 @@ class InitPluginsInstaller extends InitSection
             $params = $repository->getDefaultProperties();
             $itemSection = $item[IPluginInstall::FIELD__SECTION] ?? '';
             $section = $itemSection ?: $params['name'];
-
-            $pluginInstall = $this->createPluginInstall($section, $params, $item);
-            $pluginUninstall = $this->createPluginUninstall($section, $params, $item);
-
             $pluginRepository = new PluginRepository();
 
-            $pluginRepository->create($pluginInstall);
+            $pluginRepository->create($this->createPluginInstall($section, $params, $item));
             $this->commentLn(['Created install plugin for ' . $section]);
 
-            $pluginRepository->create($pluginUninstall);
+            $pluginRepository->create($this->createPluginUninstall($section, $params, $item));
             $this->commentLn(['Created uninstall plugin for ' . $section]);
         }
 
@@ -52,9 +49,9 @@ class InitPluginsInstaller extends InitSection
      * @param string $section
      * @param array $params
      * @param array $item
-     * @return array
+     * @return Plugin
      */
-    protected function createPluginInstall(string $section, array $params, array $item): array
+    protected function createPluginInstall(string $section, array $params, array $item): Plugin
     {
         return $this->createPluginConfig('install', $section, $params, $item);
     }
@@ -63,9 +60,9 @@ class InitPluginsInstaller extends InitSection
      * @param string $section
      * @param array $params
      * @param array $item
-     * @return array
+     * @return Plugin
      */
-    protected function createPluginUninstall(string $section, array $params, array $item): array
+    protected function createPluginUninstall(string $section, array $params, array $item): Plugin
     {
         return $this->createPluginConfig('uninstall', $section, $params, $item);
     }
@@ -75,11 +72,11 @@ class InitPluginsInstaller extends InitSection
      * @param string $section
      * @param array $params
      * @param array $item
-     * @return array
+     * @return Plugin
      */
-    protected function createPluginConfig(string $stage, string $section, array $params, array $item): array
+    protected function createPluginConfig(string $stage, string $section, array $params, array $item): Plugin
     {
-        return [
+        return new Plugin([
             IPlugin::FIELD__CLASS => 'extas\\components\\plugins\\'.$stage.'\\'.ucfirst($stage).'PluginsInstaller',
             IPlugin::FIELD__STAGE => 'extas.' . $stage . '.section.' . $section,
             IPlugin::FIELD__PARAMETERS => [
@@ -89,6 +86,6 @@ class InitPluginsInstaller extends InitSection
                 IHasName::FIELD__NAME => $item[IPluginInstall::FIELD__NAME] ?? '',
                 IHasClass::FIELD__CLASS => $params['itemClass']
             ]
-        ];
+        ]);
     }
 }
