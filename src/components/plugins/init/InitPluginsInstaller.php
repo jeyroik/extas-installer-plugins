@@ -10,6 +10,7 @@ use extas\interfaces\IHasSection;
 use extas\interfaces\IHasUid;
 use extas\interfaces\plugins\IPlugin;
 use extas\interfaces\plugins\IPluginInstall;
+use extas\interfaces\samples\parameters\ISampleParameter;
 
 /**
  * Class InitPluginsInstaller
@@ -80,11 +81,26 @@ class InitPluginsInstaller extends InitSection
             IPlugin::FIELD__CLASS => 'extas\\components\\plugins\\'.$stage.'\\'.ucfirst($stage).'PluginsInstaller',
             IPlugin::FIELD__STAGE => 'extas.' . $stage . '.section.' . $section,
             IPlugin::FIELD__PARAMETERS => [
-                IHasRepository::FIELD__REPOSITORY => $item[IPluginInstall::FIELD__REPOSITORY],
-                IHasUid::FIELD__UID => $params['pk'],
-                IHasSection::FIELD__SECTION => $section,
-                IHasName::FIELD__NAME => $item[IPluginInstall::FIELD__NAME] ?? '',
-                IHasClass::FIELD__CLASS => $params['itemClass']
+                IHasRepository::FIELD__REPOSITORY => [
+                    ISampleParameter::FIELD__NAME => IHasRepository::FIELD__REPOSITORY,
+                    ISampleParameter::FIELD__VALUE => $item[IPluginInstall::FIELD__REPOSITORY]
+                ],
+                IHasUid::FIELD__UID => [
+                    ISampleParameter::FIELD__NAME => IHasUid::FIELD__UID,
+                    ISampleParameter::FIELD__VALUE => $params['pk']
+                ],
+                IHasSection::FIELD__SECTION => [
+                    ISampleParameter::FIELD__NAME => IHasSection::FIELD__SECTION,
+                    ISampleParameter::FIELD__VALUE => $section
+                ],
+                IHasName::FIELD__NAME => [
+                    ISampleParameter::FIELD__NAME => IHasName::FIELD__NAME,
+                    ISampleParameter::FIELD__VALUE => $item[IPluginInstall::FIELD__NAME] ?? ''
+                ],
+                IHasClass::FIELD__CLASS => [
+                    ISampleParameter::FIELD__NAME => IHasClass::FIELD__CLASS,
+                    ISampleParameter::FIELD__VALUE => $params['itemClass']
+                ]
             ]
         ]);
     }
