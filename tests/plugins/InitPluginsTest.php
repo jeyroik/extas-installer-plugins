@@ -1,6 +1,7 @@
 <?php
 namespace tests\plugins;
 
+use extas\components\packages\entities\EntityRepository;
 use extas\interfaces\plugins\IPluginInstall;
 
 use extas\components\console\TSnuffConsole;
@@ -29,7 +30,10 @@ class InitPluginsTest extends TestCase
         parent::setUp();
         $env = Dotenv::create(getcwd() . '/tests/');
         $env->load();
-        $this->registerSnuffRepos(['pluginRepository' => PluginRepository::class]);
+        $this->registerSnuffRepos([
+            'pluginRepository' => PluginRepository::class,
+            'entityRepository' => EntityRepository::class
+        ]);
     }
 
     protected function tearDown(): void
