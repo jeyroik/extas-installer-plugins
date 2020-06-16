@@ -1,0 +1,10 @@
+{
+  "name": "extas/installer-plugins",
+  "installer_version": 3,
+  "plugins": [
+    {
+      "class": "extas\\components\\plugins\\init\\InitPluginsInstaller",
+      "stage": "extas.init.section.plugins_install"
+    }
+  ]
+}
