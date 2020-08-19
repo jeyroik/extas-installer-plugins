@@ -30,8 +30,7 @@ class InitPluginsInstaller extends InitSection
 
         $repositoryClass = $item[IPluginInstall::FIELD__REPOSITORY] ?? '';
         if ($repositoryClass) {
-            $repository = new \ReflectionClass($this->$repositoryClass());
-            $params = $repository->getDefaultProperties();
+            $params = $this->getRepoParams($repositoryClass);
             $itemSection = $item[IPluginInstall::FIELD__SECTION] ?? '';
             $section = $itemSection ?: $params['name'];
             $pluginRepository = new PluginRepository();
@@ -44,6 +43,24 @@ class InitPluginsInstaller extends InitSection
         }
 
         $this->writeLn(['Item initialized.']);
+    }
+
+    /**
+     * @param string $repositoryClass
+     * @return array
+     * @throws \ReflectionException
+     */
+    protected function getRepoParams(string $repositoryClass): array
+    {
+        $repo = $this->$repositoryClass();
+
+        if (method_exists($repo, 'getDefaultProperties')) {
+            return $repo->getDefaultProperties();
+        }
+
+        $repository = new \ReflectionClass($repo);
+
+        return $repository->getDefaultProperties();
     }
 
     /**

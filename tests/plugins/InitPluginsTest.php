@@ -16,6 +16,7 @@ use extas\components\plugins\PluginRepository;
 use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
+use tests\plugins\misc\DynamicRepo;
 
 /**
  * Class InitPluginsTest
@@ -36,7 +37,8 @@ class InitPluginsTest extends TestCase
         $env->load();
         $this->registerSnuffRepos([
             'pluginRepository' => PluginRepository::class,
-            'entityRepository' => EntityRepository::class
+            'entityRepository' => EntityRepository::class,
+            'dynamic' => DynamicRepo::class
         ]);
     }
 
@@ -95,5 +97,59 @@ class InitPluginsTest extends TestCase
          * One is skipped cause the same id.
          */
         $this->assertCount(2, $this->allSnuffRepos('snuffRepository'));
+    }
+
+    public function testDynamic()
+    {
+        /**
+         * @var BufferedOutput $output
+         */
+        $output = $this->getOutput(true);
+        $plugin = new InitPluginsInstaller([
+            InitPluginsInstaller::FIELD__INPUT => $this->getInput(),
+            InitPluginsInstaller::FIELD__OUTPUT => $output
+        ]);
+        $plugin('extas.init.section.plugins_install', [
+            [
+                IPluginInstall::FIELD__REPOSITORY => 'dynamic',
+                IPluginInstall::FIELD__NAME => 'snuff item',
+                IPluginInstall::FIELD__SECTION => 'snuff_items'
+            ]
+        ]);
+        $outputText = $output->fetch();
+        $this->assertStringContainsString(
+            'Created install plugin for snuff_items',
+            $outputText,
+            'Current output: ' . $outputText
+        );
+        $this->assertStringContainsString(
+            'Created uninstall plugin for snuff_items',
+            $outputText,
+            'Current output: ' . $outputText
+        );
+
+        $installer = new Installer([
+            Installer::FIELD__INPUT => $this->getInput(),
+            Installer::FIELD__OUTPUT => $output
+        ]);
+
+        $this->createSnuffPlugin(InstallPackage::class, ['extas.install.package']);
+        $this->createSnuffPlugin(InstallItem::class, ['extas.install.item']);
+
+        $installer->installPackages([
+            'test/installer' => [
+                'snuff_items' => [
+                    ['id' => 'test1'],
+                    ['id' => 'test2'],
+                    ['id' => 'test1']
+                ]
+            ]
+        ]);
+        $outputText = $output->fetch();
+
+        /**
+         * One is skipped cause the same id.
+         */
+        $this->assertCount(2, $this->allSnuffRepos('snuffRepository'), $outputText);
     }
 }
