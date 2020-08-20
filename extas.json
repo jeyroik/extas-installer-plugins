@@ -5,6 +5,10 @@
     {
       "class": "extas\\components\\plugins\\init\\InitPluginsInstaller",
       "stage": "extas.init.section.plugins_install"
+    },
+    {
+      "class": "extas\\components\\plugins\\construct\\PluginInstallConstructDefault",
+      "stage": "extas.plugin.install.construct"
     }
   ]
 }

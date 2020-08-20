@@ -2,6 +2,7 @@
 namespace tests\plugins;
 
 use extas\components\packages\entities\EntityRepository;
+use extas\components\plugins\construct\PluginInstallConstructDefault;
 use extas\components\plugins\install\InstallItem;
 use extas\components\plugins\install\InstallPackage;
 use extas\components\plugins\TSnuffPlugins;
@@ -14,6 +15,7 @@ use extas\components\repositories\TSnuffRepository;
 use extas\components\plugins\PluginRepository;
 
 use Dotenv\Dotenv;
+use extas\interfaces\stages\IStagePluginInstallConstruct;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use tests\plugins\misc\DynamicRepo;
@@ -40,6 +42,7 @@ class InitPluginsTest extends TestCase
             'entityRepository' => EntityRepository::class,
             'dynamic' => DynamicRepo::class
         ]);
+        $this->createSnuffPlugin(PluginInstallConstructDefault::class, [IStagePluginInstallConstruct::NAME]);
     }
 
     protected function tearDown(): void

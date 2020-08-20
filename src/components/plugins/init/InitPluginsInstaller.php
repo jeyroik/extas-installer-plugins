@@ -11,6 +11,7 @@ use extas\interfaces\IHasUid;
 use extas\interfaces\plugins\IPlugin;
 use extas\interfaces\plugins\IPluginInstall;
 use extas\interfaces\samples\parameters\ISampleParameter;
+use extas\interfaces\stages\IStagePluginInstallConstruct;
 
 /**
  * Class InitPluginsInstaller
@@ -94,31 +95,20 @@ class InitPluginsInstaller extends InitSection
      */
     protected function createPluginConfig(string $stage, string $section, array $params, array $item): Plugin
     {
-        return new Plugin([
-            IPlugin::FIELD__CLASS => 'extas\\components\\plugins\\'.$stage.'\\'.ucfirst($stage).'PluginsInstaller',
-            IPlugin::FIELD__STAGE => 'extas.' . $stage . '.section.' . $section,
-            IPlugin::FIELD__PARAMETERS => [
-                IHasRepository::FIELD__REPOSITORY => [
-                    ISampleParameter::FIELD__NAME => IHasRepository::FIELD__REPOSITORY,
-                    ISampleParameter::FIELD__VALUE => $item[IPluginInstall::FIELD__REPOSITORY]
-                ],
-                IHasUid::FIELD__UID => [
-                    ISampleParameter::FIELD__NAME => IHasUid::FIELD__UID,
-                    ISampleParameter::FIELD__VALUE => $params['pk']
-                ],
-                IHasSection::FIELD__SECTION => [
-                    ISampleParameter::FIELD__NAME => IHasSection::FIELD__SECTION,
-                    ISampleParameter::FIELD__VALUE => $section
-                ],
-                IHasName::FIELD__NAME => [
-                    ISampleParameter::FIELD__NAME => IHasName::FIELD__NAME,
-                    ISampleParameter::FIELD__VALUE => $item[IPluginInstall::FIELD__NAME] ?? ''
-                ],
-                IHasClass::FIELD__CLASS => [
-                    ISampleParameter::FIELD__NAME => IHasClass::FIELD__CLASS,
-                    ISampleParameter::FIELD__VALUE => $params['itemClass']
-                ]
-            ]
-        ]);
+        $newPlugin = new Plugin();
+        $config = [
+            IStagePluginInstallConstruct::FIELD__SECTION => $section,
+            IStagePluginInstallConstruct::FIELD__PARAMS => $params,
+            IStagePluginInstallConstruct::FIELD__ITEM => $item
+        ];
+
+        foreach ($this->getPluginsByStage(IStagePluginInstallConstruct::NAME, $config) as $plugin) {
+            /**
+             * @var IStagePluginInstallConstruct $plugin
+             */
+            $newPlugin = $plugin($newPlugin, $stage);
+        }
+
+        return $newPlugin;
     }
 }
