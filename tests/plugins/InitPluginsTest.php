@@ -106,6 +106,30 @@ class InitPluginsTest extends TestCase
         $this->assertCount(2, $this->allSnuffRepos('snuffRepository'));
     }
 
+    public function testUnknownRepository()
+    {
+        /**
+         * @var BufferedOutput $output
+         */
+        $output = $this->getOutput(true);
+        $plugin = new InitPluginsInstaller([
+            InitPluginsInstaller::FIELD__INPUT => $this->getInput(),
+            InitPluginsInstaller::FIELD__OUTPUT => $output
+        ]);
+        $plugin('extas.init.section.plugins_install', [
+            [
+                IPluginInstall::FIELD__REPOSITORY => 'snuffRepository2',
+                IPluginInstall::FIELD__NAME => 'snuff item'
+            ]
+        ]);
+        $outputText = $output->fetch();
+        $this->assertStringContainsString(
+            'Skip item, cause repository "snuffRepository2" is not initialized yet.',
+            $outputText,
+            'Current output: ' . $outputText
+        );
+    }
+
     public function testAdoptingToOtherPlugins()
     {
         $this->createWithSnuffRepo('pluginRepository', new Plugin([
