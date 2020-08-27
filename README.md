@@ -5,7 +5,6 @@
 [![Total Downloads](https://poser.pugx.org/jeyroik/extas-installer-plugins/downloads)](//packagist.org/packages/jeyroik/extas-jsonrpc)
 [![Dependents](https://poser.pugx.org/jeyroik/extas-installer-plugins/dependents)](//packagist.org/packages/jeyroik/extas-jsonrpc)
 
-
 # Описание
 
 Пакет предоставляет механизм описания плагинов для установки/удаления сущностей, что позволяет избежать лишнего кода.

@@ -32,15 +32,20 @@ class InitPluginsInstaller extends InitSection
         $repositoryClass = $item[IPluginInstall::FIELD__REPOSITORY] ?? '';
         if ($repositoryClass) {
             $params = $this->getRepoParams($repositoryClass);
-            $itemSection = $item[IPluginInstall::FIELD__SECTION] ?? '';
-            $section = $itemSection ?: $params['name'];
-            $pluginRepository = new PluginRepository();
 
-            $pluginRepository->create($this->createPluginInstall($section, $params, $item));
-            $this->commentLn(['Created install plugin for ' . $section]);
+            if (!empty($params)) {
+                $itemSection = $item[IPluginInstall::FIELD__SECTION] ?? '';
+                $section = $itemSection ?: $params['name'];
+                $pluginRepository = new PluginRepository();
 
-            $pluginRepository->create($this->createPluginUninstall($section, $params, $item));
-            $this->commentLn(['Created uninstall plugin for ' . $section]);
+                $pluginRepository->create($this->createPluginInstall($section, $params, $item));
+                $this->commentLn(['Created install plugin for ' . $section]);
+
+                $pluginRepository->create($this->createPluginUninstall($section, $params, $item));
+                $this->commentLn(['Created uninstall plugin for ' . $section]);
+            } else {
+                $this->infoLn(['Skip item, cause repository "' . $repositoryClass . '" is not initialized yet.']);
+            }
         }
 
         $this->writeLn(['Item initialized.']);
@@ -53,7 +58,15 @@ class InitPluginsInstaller extends InitSection
      */
     protected function getRepoParams(string $repositoryClass): array
     {
-        $repo = $this->$repositoryClass();
+        try {
+            $repo = $this->$repositoryClass();
+        } catch (\Exception $e) {
+            /**
+             * Repository not initialized yet.
+             * Will create plugins after repository will be initialized (see AfterRepositoriesInitPlugins for details).
+             */
+            return [];
+        }
 
         if (method_exists($repo, 'getDefaultProperties')) {
             return $repo->getDefaultProperties();

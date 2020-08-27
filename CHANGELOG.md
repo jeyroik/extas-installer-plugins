@@ -1,3 +1,7 @@
+# 0.3.1
+
+- Skips unknown repositories on initializing.
+
 # 0.3.0
 
 - Добавлена стадия `extas.plugin.install.construct`, позволяющая переопределить логику формирования плагинов установки и удаления.
